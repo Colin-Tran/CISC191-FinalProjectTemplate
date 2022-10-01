@@ -1,5 +1,6 @@
 package edu.sdccd.cisc191.template;
 
+import javafx.collections.ListChangeListener;
 import javafx.scene.control.Label;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
@@ -9,6 +10,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.layout.HBox;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import com.sun.javafx.scene.control.skin.TableViewSkin;
+
+import static java.lang.Integer.parseInt;
+
 public class Expenses {
     BorderPane eMenu;
     TableColumn<ExpenseObject, String> date;
@@ -30,7 +37,7 @@ public class Expenses {
 
         BorderPane eMenu = new BorderPane();
 
-        l = new Label("The total amount is: " + String.valueOf(total));
+        l = new Label("The total amount is: " + total);
 
 
         //TEXT FIELDS
@@ -66,9 +73,12 @@ public class Expenses {
         table.setFixedCellSize(75);
         eMenu.getChildren().add(table);
         root.setCenter(table);
-
+        autoFitTable(table);
         addNewRow.setOnAction(e -> {
             addRecord();
+            updateTotal();
+            l.setText("The total amount is: " + total);
+            System.out.println(total);
         });
 
     }
@@ -92,10 +102,41 @@ public class Expenses {
             table.getItems().add(expenses);
         }
 
-        public int updateTotal(int amountChange){
-            amountChange = Integer.valueOf(amountEnter.getText());
-            return total += amountChange;
+        public int updateTotal() {
+            if(amountEnter.getText().equals("Enter Numeric Value of Expense")){
+                amountEnter.setText("Please enter a number!");
+            }else {
+                int amountChange = parseInt(amountEnter.getText());
+                System.out.println(amountChange);
+                total += amountChange;
+            }
+            return total;
         }
+
+    private static Method columnToFitMethod;
+
+    static {
+        try {
+            columnToFitMethod = TableViewSkin.class.getDeclaredMethod("resizeColumnToFitContent", TableColumn.class, int.class);
+            columnToFitMethod.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void autoFitTable(TableView tableView) {
+        tableView.getItems().addListener(new ListChangeListener<Object>() {
+            public void onChanged(Change<?> c) {
+                for (Object column : tableView.getColumns()) {
+                    try {
+                        columnToFitMethod.invoke(tableView.getSkin(), column, -1);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
 
 
 }
