@@ -2,51 +2,60 @@ package edu.sdccd.cisc191.template;
 
 import java.net.*;
 import java.io.*;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.control.Button;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.layout.Pane;
+import javafx.scene.control.Control;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 
-/**
- * This program is a server that takes connection requests on
- * the port specified by the constant LISTENING_PORT.  When a
- * connection is opened, the program sends the current time to
- * the connected socket.  The program will continue to receive
- * and process connections until it is killed (by a CONTROL-C,
- * for example).  Note that this server processes each connection
- * as it is received, rather than creating a separate thread
- * to process the connection.
- */
-public class Server {
-    private ServerSocket serverSocket;
-    private Socket clientSocket;
-    private PrintWriter out;
-    private BufferedReader in;
+public class Server extends Application{
 
-    public void start(int port) throws Exception {
-        serverSocket = new ServerSocket(port);
-        clientSocket = serverSocket.accept();
-        out = new PrintWriter(clientSocket.getOutputStream(), true);
-        in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+    public void start(Stage stage) throws Exception{
 
-        String inputLine;
-        while ((inputLine = in.readLine()) != null) {
-            CustomerRequest request = CustomerRequest.fromJSON(inputLine);
-            CustomerResponse response = new CustomerResponse(request.getId(), "Jane", "Doe");
-            out.println(CustomerResponse.toJSON(response));
-        }
-    }
+        BorderPane root = new BorderPane();
 
-    public void stop() throws IOException {
-        in.close();
-        out.close();
-        clientSocket.close();
-        serverSocket.close();
+
+        Button button = new Button("Expenses and Income");
+        button.setPrefSize(250, 100);
+
+        root.setTop(button);
+
+        button.setOnAction(e -> {
+            Expenses exp = new Expenses(root);
+        });
+
+
+        Pane p = new Pane();
+        Font f = new Font("SANS_SERIF", 50);
+        Text t = new Text(200, 250, "Expense Tracker");
+        t.isUnderline();
+        t.setFont(f);
+        p.getChildren().add(t);
+        root.setCenter(p);
+
+        Button exitButton = new Button("Exit");
+        exitButton.setPrefSize(150, 100);
+        root.setBottom(exitButton);
+        exitButton.setOnAction(e -> {
+            System.exit(0);
+        });
+
+        Scene primaryScene = new Scene(root, 750, 750);
+        stage.setTitle("ExpenseTracker");
+        stage.setScene(primaryScene);
+        stage.show();
     }
 
     public static void main(String[] args) {
-        Server server = new Server();
-        try {
-            server.start(4444);
-            server.stop();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+
+        launch();
+
     }
-} //end class Server
+}
