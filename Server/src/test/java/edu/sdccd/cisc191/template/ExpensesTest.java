@@ -17,6 +17,10 @@ public class ExpensesTest {
         assertEquals("Enter Numeric Value of Expense", test.amountEnter.getText());
         assertEquals("Enter Description of Expense", test.descriptionEnter.getText());
         assertEquals(null, test.datep.getValue());
+
+        assertEquals("Enter Numeric Value of the amount you are going to invest", test.interestRate.getText());
+        assertEquals("Enter Numeric Value of the Number of Years planned on investing", test.years.getText());
+        assertEquals("Enter the Percentage Value of the monthly interest rate on your investment", test.interestRate.getText());
     }
 
     @Test

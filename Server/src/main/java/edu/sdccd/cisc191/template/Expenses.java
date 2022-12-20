@@ -41,6 +41,11 @@ public class Expenses implements Getters{
     TableColumn Amount;
     Label l;
     int total = 0;
+
+    double investment;
+    double timeInYears;
+    double rateBack;
+
     public Expenses(BorderPane root) {
 
         BorderPane eMenu = new BorderPane();
@@ -79,6 +84,10 @@ public class Expenses implements Getters{
         interestRateCalculator.getChildren().add(monthlyInterestRateLabel);
         interestRateCalculator.getChildren().add(interestRate);
         interestRateCalculator.getChildren().add(CalculateButton);
+
+        CalculateButton.setOnAction(e -> {
+            computeCapital(getInvestment(),getTimeInYears(),getRateBack());
+        });
 
         root.setRight(interestRateCalculator);
 
@@ -124,6 +133,16 @@ public class Expenses implements Getters{
 
     }
 
+        public double getInvestment(){
+           return investment = parseDouble(investmentAmount.getText());
+    }
+        public double getTimeInYears(){
+           return timeInYears = parseDouble(years.getText());
+        }
+        public double getRateBack(){
+            return rateBack = parseDouble(interestRate.getText())  / 100;
+        }
+
         public String getDate(){
            return datep.getValue().toString();
         }
@@ -166,18 +185,15 @@ public class Expenses implements Getters{
         }
     }
     public double computeCapital(double capital, double year, double interestRates) {
-        capital  = parseDouble(investmentAmount.getText());
-        year = parseDouble(years.getText());
-        interestRates  = parseDouble(interestRate.getText())  / 100;
 
         if (year == 0) {
-            System.out.println("Your invested amount after "+ years + "is " + capital);
+            System.out.println("Your invested amount after "+ getTimeInYears() + "is " + capital);
             return capital;
         } else {
-            double newcapital = capital * Math.pow(interestRates,year);
-            System.out.println("Your invested amount after "+ years + "is " + capital);
-            return computeCapital(newcapital , year+1 , interestRates);
+             capital += (capital * interestRates);
 
+            System.out.println("Your invested amount after "+ getTimeInYears() + "is " + capital);
+            return computeCapital(capital, year-1, interestRates);
         }
     }
     public static void autoFitTable(TableView tableView) {
