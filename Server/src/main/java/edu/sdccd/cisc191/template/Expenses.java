@@ -13,20 +13,28 @@ import javafx.scene.layout.HBox;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
+import javafx.scene.layout.VBox;
 
+import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
 
-public class Expenses {
+public class Expenses implements Getters{
     BorderPane eMenu;
     TableColumn<ExpenseObject, String> date;
     TableColumn<ExpenseObject, String> description;
     TableColumn<ExpenseObject, Integer> amount;
     HBox userEnter;
+    HBox bottomButtons;
     DatePicker datep;
     TextField descriptionEnter;
     TextField amountEnter;
-    Button addNewRow ;
 
+    TextField investmentAmount;
+    TextField years;
+    TextField interestRate;
+
+    Button addNewRow ;
+    Button exitButton;
     TableView table;
     TableColumn Date;
     TableColumn Description;
@@ -46,15 +54,47 @@ public class Expenses {
         descriptionEnter = new TextField("Enter Description of Expense");
         amountEnter = new TextField("Enter Numeric Value of Expense");
 
+        Label investmentAmountLabel = new Label("Investment Amount:");
+        Label NumberOfYearsLabel = new Label("Number Of Years:");
+        Label monthlyInterestRateLabel = new Label("Monthly Interest Rate:");
+
+        investmentAmount = new TextField("Enter Numeric Value of the amount you are going to invest");
+        years = new TextField("Enter Numeric Value of the Number of Years planned on investing");
+        interestRate = new TextField("Enter the Percentage Value of the monthly interest rate on your investment");
+
         userEnter.getChildren().add(datep);
         userEnter.getChildren().add(descriptionEnter);
         userEnter.getChildren().add(amountEnter);
         userEnter.getChildren().add(l);
         root.setTop(userEnter);
 
-        //TABLE
+        //TABLE and Buttons
+        VBox interestRateCalculator = new VBox();
+        Button CalculateButton = new Button("Calculate");
+
+        interestRateCalculator.getChildren().add(investmentAmountLabel);
+        interestRateCalculator.getChildren().add(investmentAmount);
+        interestRateCalculator.getChildren().add(NumberOfYearsLabel);
+        interestRateCalculator.getChildren().add(years);
+        interestRateCalculator.getChildren().add(monthlyInterestRateLabel);
+        interestRateCalculator.getChildren().add(interestRate);
+        interestRateCalculator.getChildren().add(CalculateButton);
+
+        root.setRight(interestRateCalculator);
+
+        bottomButtons = new HBox();
+
         addNewRow = new Button("Add Values");
-        root.setBottom(addNewRow);
+        exitButton = new Button("Exit");
+
+        exitButton.setOnAction(e -> {
+            System.exit(0);
+        });
+
+        bottomButtons.getChildren().add(exitButton);
+        bottomButtons.getChildren().add(addNewRow);
+        root.setBottom(bottomButtons);
+
         table = new TableView();
         table.setEditable(false);
 
@@ -81,19 +121,21 @@ public class Expenses {
             System.out.println(total);
         });
 
+
     }
 
         public String getDate(){
            return datep.getValue().toString();
         }
-        public String getDesc(){
+        public String getDescription(){
             return descriptionEnter.getText();
         }
         public int getAmount(){
             return Integer.valueOf(amountEnter.getText());
         }
+
         public ExpenseObject createNew(String dat, String desc, Integer i){
-           return new ExpenseObject( getDate(), getDesc(), getAmount());
+           return new ExpenseObject( getDate(), getDescription(), getAmount());
         }
 
 
@@ -123,7 +165,21 @@ public class Expenses {
             e.printStackTrace();
         }
     }
+    public double computeCapital(double capital, double year, double interestRates) {
+        capital  = parseDouble(investmentAmount.getText());
+        year = parseDouble(years.getText());
+        interestRates  = parseDouble(interestRate.getText())  / 100;
 
+        if (year == 0) {
+            System.out.println("Your invested amount after "+ years + "is " + capital);
+            return capital;
+        } else {
+            double newcapital = capital * Math.pow(interestRates,year);
+            System.out.println("Your invested amount after "+ years + "is " + capital);
+            return computeCapital(newcapital , year+1 , interestRates);
+
+        }
+    }
     public static void autoFitTable(TableView tableView) {
         tableView.getItems().addListener(new ListChangeListener<Object>() {
             public void onChanged(Change<?> c) {

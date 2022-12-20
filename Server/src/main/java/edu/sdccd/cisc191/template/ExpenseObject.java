@@ -6,7 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.layout.BorderPane;
 
 
-public class ExpenseObject {
+public class ExpenseObject implements Getters{
     private SimpleStringProperty date;
     private SimpleStringProperty description;
     private SimpleIntegerProperty amount;
@@ -33,7 +33,15 @@ public class ExpenseObject {
     public String getDescription(){
         return description.get();
     }
-
+    public void setDate(SimpleStringProperty date){
+        this.date = date;
+    }
+    public void setDescription(SimpleStringProperty description){
+        this.description = description;
+    }
+    public void setAmount(SimpleIntegerProperty amount){
+        this.amount = amount;
+    }
 
 
 
